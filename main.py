@@ -5,7 +5,7 @@ from datetime import datetime
 
 def main():
     try:
-        path_ = f"{getcwd()}/logs"
+        path_ = f"{getcwd()}/dmsg_logs"
         curr_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")  # This strftime is used to Filter out the Microseconds from Main Time
         cmd = f"dmesg -w > {path_}/{curr_time}.txt"
         if path.exists(path_) is True:
