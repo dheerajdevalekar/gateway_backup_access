@@ -1,0 +1,15 @@
+# Reference
+# https://github.com/torfsen/python-systemd-tutorial
+
+[Unit]
+Description=Dmsg Looger
+
+[Service]
+# Command to execute when the service is started
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/dmesg_logger
+ExecStart=/home/pi/iam-gateway/venv/bin/python3  /home/pi/dmesg_logger/main.py
+
+[Install]
+WantedBy=default.target
