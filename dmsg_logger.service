@@ -2,7 +2,7 @@
 # https://github.com/torfsen/python-systemd-tutorial
 
 [Unit]
-Description=Dmsg Looger
+Description=Dmsg Logger
 
 [Service]
 # Command to execute when the service is started
