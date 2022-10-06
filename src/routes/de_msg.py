@@ -22,7 +22,7 @@ def get_inside_folders(folder_path: str):
         return log_folder
 
 
-@router.get('/ls_demsg_folder', tags=['DeMsg Folder list'])
+@router.get('/ls_dmsg_folder', tags=['DMESG Filename list'])
 def get_list_of_de_msg_folder():
     try:
         count = 0
@@ -41,17 +41,17 @@ def get_list_of_de_msg_folder():
         return HTTPException(status_code=500, detail=f'{e}')
 
 
-@router.get('/dmsg_logs', tags=['DMESSAGE logs'])
-def get_de_msg():
+@router.get('/dmsg_logs', tags=['DMESG logs'])
+def get_de_msg(user_file_name: str):
     try:
         count = 0
         all_logs = []
         ret_dict = {"all_logs": [], "count": 0}
-        folder = get_inside_folders(folder_path=path_)
-        # if user_file_name == "all":
-        if folder is not None:
-            for files in folder:
-                file_path_ = f"{getcwd()}/dmesg_logs/{files}"
+        folder_contains = get_inside_folders(folder_path=path_)
+        # TODO: This is for Display all file contains
+        if user_file_name == "all":
+            for files_ in folder_contains:
+                file_path_ = f"{getcwd()}/dmesg_logs/{files_}"
                 if file_path_ is not None:
                     log_file_txt = open(file_path_, "r")
                     log_lines = log_file_txt.readlines()
@@ -59,19 +59,20 @@ def get_de_msg():
                     for each_line in log_lines:
                         all_logs.append(each_line)
                         count = count + 1
-                    ret_dict.update({"all_logs": all_logs, "count": count})
-        # else:
-        #     if folder is not None:
-        #         if user_file_name in folder:
-        #             file_path = f"{getcwd()}/dmesg_logs/{user_file_name}"
-        #             if file_path is not None:
-        #                 log_file_txt = open(file_path, "r")
-        #                 log_lines = log_file_txt.readlines()
-        #                 log_file_txt.close()
-        #                 for each_line in log_lines:
-        #                     all_logs.append(each_line)
-        #                     count = count + 1
-        #                 ret_dict.update({"all_logs": all_logs, "count": count})
+        # TODO: This is for Display file contains with specific file name
+        else:
+            if folder_contains is not None:
+                for files in folder_contains:
+                    if files == user_file_name:
+                        file_path_ = f"{getcwd()}/dmesg_logs/{files}"
+                        if file_path_ is not None:
+                            log_file_txt = open(file_path_, "r")
+                            log_lines = log_file_txt.readlines()
+                            log_file_txt.close()
+                            for each_line in log_lines:
+                                all_logs.append(each_line)
+                                count = count + 1
+        ret_dict.update({"all_logs": all_logs, "count": count})
         raise HTTPException(status_code=200, detail=ret_dict)
     except HTTPException:
         raise

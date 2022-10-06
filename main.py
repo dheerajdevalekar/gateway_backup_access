@@ -4,10 +4,19 @@ from datetime import datetime
 from uvicorn import run
 from fastapi import FastAPI
 from src.routes.de_msg import router
+from _thread import start_new_thread
 
 app = FastAPI()
 
 app.include_router(router)
+
+
+@app.on_event("startup")
+async def init_process():
+    try:
+        start_new_thread(main, ())
+    except Exception as e:
+        logger.error(f"{e}")
 
 
 def main():
