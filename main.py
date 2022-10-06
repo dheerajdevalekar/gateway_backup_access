@@ -3,12 +3,14 @@ from os import getcwd, system, path
 from datetime import datetime
 from uvicorn import run
 from fastapi import FastAPI
-from src.routes.de_msg import router
+from src.routes.list_demsg import router as ls_dmesg
+from src.routes.previous_logs import router as prev_logs
 from _thread import start_new_thread
 
 app = FastAPI()
 
-app.include_router(router)
+app.include_router(ls_dmesg)
+app.include_router(prev_logs)
 
 
 @app.on_event("startup")

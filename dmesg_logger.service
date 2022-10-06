@@ -10,6 +10,7 @@ User=pi
 Group=pi
 WorkingDirectory=/home/pi/dmesg_logger
 ExecStart=/home/pi/iam-gateway/venv/bin/python3  /home/pi/dmesg_logger/main.py
+Environment="LOG_PATH=/home/pi/iam-gateway/logs"
 
 [Install]
 WantedBy=default.target
