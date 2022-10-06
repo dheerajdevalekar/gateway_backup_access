@@ -1,6 +1,13 @@
 from loguru import logger
 from os import getcwd, system, path
 from datetime import datetime
+from uvicorn import run
+from fastapi import FastAPI
+from src.routes.de_msg import router
+
+app = FastAPI()
+
+app.include_router(router)
 
 
 def main():
@@ -20,4 +27,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    run("main:app", host="0.0.0.0", port=5008, reload=True)
