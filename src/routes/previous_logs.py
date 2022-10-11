@@ -22,7 +22,7 @@ def get_inside_folders(folder_path: str):
         return None
 
 
-@router.get('/ls_prev_date', tags=['logs'])
+@router.get('/ls_prev_date', tags=['Previous Logs'])
 def get_list_of_prev_date():
     try:
         prev_date_list = []
@@ -35,7 +35,7 @@ def get_list_of_prev_date():
         raise e
 
 
-@router.get('/ls_prev_log', tags=['logs'])
+@router.get('/ls_prev_log', tags=['Previous Logs'])
 def get_list_of_previous_logs(
         usr_date: str
 ):

@@ -22,7 +22,7 @@ def get_inside_folders(folder_path: str):
         return log_folder
 
 
-@router.get('/ls_dmsg_folder', tags=['DMESG Filename list'])
+@router.get('/ls_dmsg_folder', tags=['DMESG'])
 def get_list_of_de_msg_folder():
     try:
         count = 0
@@ -41,7 +41,7 @@ def get_list_of_de_msg_folder():
         return HTTPException(status_code=500, detail=f'{e}')
 
 
-@router.get('/dmsg_logs', tags=['DMESG logs'])
+@router.get('/dmsg_logs', tags=['DMESG'])
 def get_de_msg(user_file_name: str):
     try:
         count = 0

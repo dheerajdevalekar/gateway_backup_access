@@ -1,16 +1,18 @@
 from loguru import logger
 from os import getcwd, system, path
-from datetime import datetime
+from datetime import datetime, time
 from uvicorn import run
 from fastapi import FastAPI
 from src.routes.list_demsg import router as ls_dmesg
 from src.routes.previous_logs import router as prev_logs
+from src.routes.online_sqlite_browser import router as online_sqlite_browser
 from _thread import start_new_thread
 
-app = FastAPI()
+app = FastAPI(title=f"Gateway Backup Solution")
 
 app.include_router(ls_dmesg)
 app.include_router(prev_logs)
+app.include_router(online_sqlite_browser)
 
 
 @app.on_event("startup")
