@@ -18,6 +18,7 @@ app.include_router(online_sqlite_browser)
 @app.on_event("startup")
 async def init_process():
     try:
+        logger.info(f"Gateway Backup Solution STARTS with PORT: 5008")
         start_new_thread(main, ())
     except Exception as e:
         logger.error(f"{e}")
