@@ -2,14 +2,14 @@
 # https://github.com/torfsen/python-systemd-tutorial
 
 [Unit]
-Description=Dmesg Logger
+Description=Gateway Backup Logs and Access
 
 [Service]
 # Command to execute when the service is started
 User=pi
 Group=pi
-WorkingDirectory=/home/pi/dmesg_logger
-ExecStart=/home/pi/iam-gateway/venv/bin/python3  /home/pi/dmesg_logger/main.py
+WorkingDirectory=/home/pi/gateway_backup_access
+ExecStart=/home/pi/iam-gateway/venv/bin/python3  /home/pi/gateway_backup_access/main.py
 Environment="LOG_PATH=/home/pi/iam-gateway/logs"
 
 [Install]
