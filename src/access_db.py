@@ -123,4 +123,6 @@ try:
     else:
         sleep(1)
 except Exception as error:
+    if db_conn is not None:
+        db_conn.close()
     logger.error(f"{error}")
