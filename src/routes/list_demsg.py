@@ -116,8 +116,12 @@ def get_mac_addr():
 def send_dmesg_to_cloud():
     global is_created_new_file, cloud_push_previous_log_count
     try:
+        is_panel_number = False
         dmesg_list = {}
         panel_number = get_panel_number()
+        if is_panel_number:
+            is_panel_number = True
+        is_panel_number= False
         folder_contains = get_inside_folders(folder_path=path_)
         last_file_path = f"{getcwd()}/dmesg_logs/{max(folder_contains)}"
         last_log_file_txt = open(last_file_path, "r")
@@ -130,8 +134,11 @@ def send_dmesg_to_cloud():
         else:
             if len(log_lines) > cloud_push_previous_log_count:
                 updated_log_lines = log_lines[(cloud_push_previous_log_count - len(log_lines)):]
-                dmesg_list = {"panel_number": panel_number, "time_": datetime.now(), "total_dmesg_count": {len(log_lines)},
-                              "is_created_new_file": is_created_new_file, "new_dmesg_count": len(updated_log_lines), "dmesg_list": updated_log_lines}
+                dmesg_list = {"panel_number": panel_number, "time_": datetime.now(),
+                              "total_dmesg_count": {len(log_lines)},
+                              "is_created_new_file": is_created_new_file,
+                              "new_dmesg_count": len(updated_log_lines),
+                              "dmesg_list": updated_log_lines}
                 cloud_push_previous_log_count = cloud_push_previous_log_count + len(updated_log_lines)
         if is_created_new_file:
             is_created_new_file = False
