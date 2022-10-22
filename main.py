@@ -3,7 +3,7 @@ from os import getcwd, system, path
 from datetime import datetime, time
 from uvicorn import run
 from fastapi import FastAPI
-from src.routes.list_demsg import router as ls_dmesg
+from src.routes.list_demsg import router as ls_dmesg, send_dmesg_to_cloud
 from src.routes.previous_logs import router as prev_logs
 from src.routes.online_sqlite_browser import router as online_sqlite_browser
 from _thread import start_new_thread
@@ -20,6 +20,8 @@ async def init_process():
     try:
         logger.info(f"Gateway Backup Solution STARTS with PORT: 5008")
         start_new_thread(main, ())
+        logger.info("start push file on cloud")
+        start_new_thread(send_dmesg_to_cloud, ())
     except Exception as e:
         logger.error(f"{e}")
 
@@ -27,7 +29,8 @@ async def init_process():
 def main():
     try:
         path_ = f"{getcwd()}/dmesg_logs"
-        curr_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")  # This strftime is used to Filter out the Microseconds from Main Time
+        curr_time = datetime.now().strftime(
+            "%Y-%m-%d_%H:%M:%S")  # This strftime is used to Filter out the Microseconds from Main Time
         cmd = f"dmesg -w -H > {path_}/{curr_time}.txt"
         if path.exists(path_) is True:
             logger.info(f"{path_} Folder Already Exist")
@@ -41,4 +44,4 @@ def main():
 
 
 if __name__ == '__main__':
-    run("main:app", host="0.0.0.0", port=5008, reload=True)
+    run("main:app", host="0.0.0.0", port=5009, reload=False)

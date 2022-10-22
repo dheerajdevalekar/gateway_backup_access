@@ -1,13 +1,15 @@
 from datetime import datetime
+from time import sleep
+from json import dump, loads, dumps
 from loguru import logger
-from requests import get
+from requests import get, post
 from fastapi import APIRouter, HTTPException
 from os import listdir, getcwd, getenv
 
 router = APIRouter()
 path_ = None
 cloud_push_server_ip = "localhost"
-cloud_push_port_num = 5001
+cloud_push_port_num = 5010
 panel_number_url = f"http://localhost:5001/gateway_detail"
 is_created_new_file = True
 cloud_push_previous_log_count = None
@@ -102,6 +104,7 @@ def get_panel_number():
         panel_number = get_mac_addr()
         logger.error(f"{e}")
     finally:
+        logger.info(f"Found Panel Number: {panel_number}")
         return panel_number
 
 
@@ -112,38 +115,45 @@ def get_mac_addr():
         logger.error(f"{e}")
 
 
-@router.get('/dmsg_logs_send_cloud', tags=['DMESG on cloud'])
+# @router.get('/dmsg_logs_send_cloud', tags=['DMESG on cloud'])
 def send_dmesg_to_cloud():
     global is_created_new_file, cloud_push_previous_log_count
-    try:
-        is_panel_number = False
-        dmesg_list = {}
-        panel_number = get_panel_number()
-        if is_panel_number:
-            is_panel_number = True
-        is_panel_number= False
-        folder_contains = get_inside_folders(folder_path=path_)
-        last_file_path = f"{getcwd()}/dmesg_logs/{max(folder_contains)}"
-        last_log_file_txt = open(last_file_path, "r")
-        log_lines = last_log_file_txt.readlines()
-        last_log_file_txt.close()
-        if cloud_push_previous_log_count is None:
-            cloud_push_previous_log_count = len(log_lines)
-            dmesg_list = {"panel_number": panel_number, "time_": datetime.now(), "total_dmesg_count": {len(log_lines)},
-                          "is_created_new_file": is_created_new_file, "new_dmesg_count": len(log_lines), "dmesg_list": log_lines}
-        else:
-            if len(log_lines) > cloud_push_previous_log_count:
-                updated_log_lines = log_lines[(cloud_push_previous_log_count - len(log_lines)):]
-                dmesg_list = {"panel_number": panel_number, "time_": datetime.now(),
-                              "total_dmesg_count": {len(log_lines)},
-                              "is_created_new_file": is_created_new_file,
-                              "new_dmesg_count": len(updated_log_lines),
-                              "dmesg_list": updated_log_lines}
-                cloud_push_previous_log_count = cloud_push_previous_log_count + len(updated_log_lines)
-        if is_created_new_file:
-            is_created_new_file = False
-        return dmesg_list
-    except HTTPException:
-        raise
-    except Exception as e:
-        return HTTPException(status_code=500, detail=f'{e}')
+    panel_number = get_panel_number()
+    while True:
+        try:
+            dmesg_list = {}
+            folder_contains = get_inside_folders(folder_path=path_)
+            last_file_path = f"{getcwd()}/dmesg_logs/{max(folder_contains)}"
+            print(last_file_path)
+            last_log_file_txt = open(last_file_path, "r")
+            log_lines = last_log_file_txt.readlines()
+            last_log_file_txt.close()
+            if cloud_push_previous_log_count is None:
+                cloud_push_previous_log_count = len(log_lines)
+                dmesg_list = {"panel_number": panel_number, "time_": str(datetime.now()),
+                              "total_dmesg_count": len(log_lines),
+                              "is_created_new_file": is_created_new_file, "new_dmesg_count": len(log_lines),
+                              "dmesg_list": [str(log_lines)]}
+            else:
+                if len(log_lines) > cloud_push_previous_log_count:
+                    updated_log_lines = log_lines[(cloud_push_previous_log_count - len(log_lines)):]
+                    dmesg_list = {"panel_number": panel_number, "time_": str(datetime.now()),
+                                  "total_dmesg_count": len(log_lines),
+                                  "is_created_new_file": is_created_new_file,
+                                  "new_dmesg_count": len(updated_log_lines),
+                                  "dmesg_list": [str(updated_log_lines)]}
+                    cloud_push_previous_log_count = cloud_push_previous_log_count + len(updated_log_lines)
+            if is_created_new_file:
+                is_created_new_file = False
+            # post(f"http://{cloud_push_server_ip}:{cloud_push_port_num}/send_on_cloud", json=dmesg_list)
+            try:
+                post(f"http://0.0.0.0:5012/send_on_cloud", json=dmesg_list)
+                # print(res.json())
+            except:
+                pass
+        except HTTPException:
+            raise
+        except Exception as e:
+            return HTTPException(status_code=500, detail=f'{e}')
+        finally:
+            sleep(20)
