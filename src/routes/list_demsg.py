@@ -124,20 +124,20 @@ def send_dmesg_to_cloud():
             dmesg_list = {}
             folder_contains = get_inside_folders(folder_path=path_)
             last_file_path = f"{getcwd()}/dmesg_logs/{max(folder_contains)}"
-            print(last_file_path)
+            # print(last_file_path)
             last_log_file_txt = open(last_file_path, "r")
             log_lines = last_log_file_txt.readlines()
             last_log_file_txt.close()
             if cloud_push_previous_log_count is None:
                 cloud_push_previous_log_count = len(log_lines)
-                dmesg_list = {"panel_number": panel_number, "time_": str(datetime.now()),
+                dmesg_list = {"panel_number": panel_number, "time_": str(datetime.now().replace(microsecond=0)),
                               "total_dmesg_count": len(log_lines),
                               "is_created_new_file": is_created_new_file, "new_dmesg_count": len(log_lines),
                               "dmesg_list": [str(log_lines)]}
             else:
                 if len(log_lines) > cloud_push_previous_log_count:
                     updated_log_lines = log_lines[(cloud_push_previous_log_count - len(log_lines)):]
-                    dmesg_list = {"panel_number": panel_number, "time_": str(datetime.now()),
+                    dmesg_list = {"panel_number": panel_number, "time_": str(datetime.now().replace(microsecond=0)),
                                   "total_dmesg_count": len(log_lines),
                                   "is_created_new_file": is_created_new_file,
                                   "new_dmesg_count": len(updated_log_lines),
@@ -147,13 +147,12 @@ def send_dmesg_to_cloud():
                 is_created_new_file = False
             # post(f"http://{cloud_push_server_ip}:{cloud_push_port_num}/send_on_cloud", json=dmesg_list)
             try:
-                post(f"http://0.0.0.0:5012/send_on_cloud", json=dmesg_list)
-                # print(res.json())
-            except:
-                pass
-        except HTTPException:
-            raise
+                logger.info("push demesg started.......")
+                post(f"http://0.0.0.0:5014/send_on_cloud", json=dmesg_list)
+                # logger.info("push done")
+            except HTTPException:
+                raise
         except Exception as e:
-            return HTTPException(status_code=500, detail=f'{e}')
+            logger.error(f"{e}")
         finally:
             sleep(20)
